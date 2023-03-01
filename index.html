@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 
 <head>
@@ -9,6 +9,7 @@
 </head>
 
 <body>
+    <!-- <a href="test.html">JSON入力</a> -->
     <div>
         <button id="start-btn">START</button>
         <button id="stop-btn">STOP</button>
@@ -24,10 +25,15 @@
             </p>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
-        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
+        //GAS WebアプリのURL
+        const END_POINT = "https://script.google.com/macros/s/AKfycbxv54tcn6c5cr7cs6-ugnRfQBTF_OOUJxFGY1fDoG_rbqLSlzBO06HegbeKyDMGyyQZHg/exec";
+        //読み書きするスプレッドシート（タブ）の番号
+        const SHEET_NO = 1;
+
+        // Document.querySelector()
+        // https://developer.mozilla.org/ja/docs/Web/API/Document/querySelector
         const startBtn = document.querySelector("#start-btn");
         const stopBtn = document.querySelector("#stop-btn");
         const process = document.querySelector("#process");
@@ -42,15 +48,21 @@
         // 認識を終わらせない
         recognition.continuous = true;
 
+        // SpeechRecognition: result イベント
+        // https://developer.mozilla.org/ja/docs/Web/API/SpeechRecognition/result_event
         recognition.onresult = (event) => {
             let interimTranscript = ""; // 認識中のテキスト
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 let transcript = event.results[i][0].transcript;
+                // console.log(event.results[i]);
                 if (event.results[i].isFinal) {
                     // 音声認識が完了した場合にisFinalがtrueになる
                     var result = document.createElement("li");
                     result.innerText = transcript;
                     results.appendChild(result);
+                    const text = [{ "id": "0", "name": transcript }];
+                    postToGAS(text);
+                    console.log(transcript);
                 } else {
                     interimTranscript += transcript;
                 }
@@ -65,102 +77,16 @@
         stopBtn.onclick = () => {
             recognition.stop();
         };
-        
-    //GAS WebアプリのURL
-    const END_POINT = "https://script.google.com/macros/s/AKfycbxv54tcn6c5cr7cs6-ugnRfQBTF_OOUJxFGY1fDoG_rbqLSlzBO06HegbeKyDMGyyQZHg/exec";
-    //読み書きするスプレッドシート（タブ）の番号
-    const SHEET_NO = 1;
-    document.getElementById("stopBtn").addEventListener('click', postToGAS, false);
-    document.getElementById("getButton").addEventListener('click', getFromGAS, false);
-    let dataObj = { };
-    function postToGAS() {
-    const Content = document.getElementById("textArea").value.trim();
-    console.log(Content);
-    //データがJSONかどうかのチェック
-    try {
-    const checkJSON = JSON.parse(Content);
-    if (checkJSON.length > 0 && Object.keys(checkJSON).length > 0) {
-    console.log("data is OK");
-    } else {
-    throw "data is not array of object";
-    }
-    }
-    catch (e) {
-    alert("error:" + e);
-    return;
-    }
-    //POST送信
-    $.ajax({
-    type: "POST",
-    url: END_POINT,
-    dataType: "json",
-    data: {sheetNo: SHEET_NO, data: Content }
-    })
-    .then(
-    (result) => { // 成功した時の処理
-    console.log(JSON.stringify(result));
-    },
-    (error) => { // 失敗した時の処理
-    alert('Error:' + JSON.stringify(error));
-    }
-    );
-    }
-    function getFromGAS() {
-    $.ajax({
-    type: "GET",
-    url: END_POINT,
-    data: { sheetNo: SHEET_NO }
-    }).done((result) => { // 成功した時の処理
-    dataObj = JSON.parse(result);
-    document.getElementById("textArea").value = result;
-    console.log("get done:" + result);
-    }).fail((error) => { // 失敗した時の処理
-    alert('Error:' + JSON.stringify(error));
-    }).always((data) => {// 常にやる処理
-    // do something
-    });
-    }
-    </script>
-</body>
-
-</html> -->
-<!DOCTYPE html>
-<html lang="ja">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Get/Post with Google SpreadSheet</title>
-</head>
-
-<body>
-    <p>GET and POST <br>
-        to Google SpreadSheet</p>
-    <textarea id="textArea" rows="5" cols="25"></textarea>
-    <br>
-    <button id="postButton">POST</button>
-    <button id="getButton">GET</button>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
-
-    <script>
-        //GAS WebアプリのURL
-        const END_POINT = "https://script.google.com/macros/s/AKfycbxv54tcn6c5cr7cs6-ugnRfQBTF_OOUJxFGY1fDoG_rbqLSlzBO06HegbeKyDMGyyQZHg/exec";
-        //読み書きするスプレッドシート（タブ）の番号
-        const SHEET_NO = 1;
-
-        document.getElementById("postButton").addEventListener('click', postToGAS, false);
-        document.getElementById("getButton").addEventListener('click', getFromGAS, false);
-        let dataObj = {};
-
-        function postToGAS() {
-            const Content = document.getElementById("textArea").value.trim();
+        function postToGAS(Content) {
             console.log(Content);
 
             //データがJSONかどうかのチェック
             try {
+                // JSON parseとstringifyについて
+                // https://www.task-notes.com/entry/20160719/1468858991
+                Content = JSON.stringify(Content);
                 const checkJSON = JSON.parse(Content);
+                console.log(checkJSON);
                 if (checkJSON.length > 0 && Object.keys(checkJSON).length > 0) {
                     console.log("data is OK");
                 } else {
@@ -187,25 +113,6 @@
                         alert('Error:' + JSON.stringify(error));
                     }
                 );
-        }
-
-        function getFromGAS() {
-            $.ajax({
-                type: "GET",
-                url: END_POINT,
-                data: { sheetNo: SHEET_NO }
-
-            }).done((result) => {        // 成功した時の処理
-                dataObj = JSON.parse(result);
-                document.getElementById("textArea").value = result;
-                console.log("get done:" + result);
-
-            }).fail((error) => {  // 失敗した時の処理
-                alert('Error:' + JSON.stringify(error));
-
-            }).always((data) => {// 常にやる処理
-                // do something
-            });
         }
     </script>
 </body>
