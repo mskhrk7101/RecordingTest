@@ -205,23 +205,24 @@
             for (let i = 0; times.length > i; i++) {
                 let dt = new Date(times[i].日時);
                 dt = dt.toLocaleString();
-                var result = dt.substring(0, 9);
-                console.log(result);
-                times[i].日時 = result;
+                console.log(dt);
+                var date = dt.split(" ");
+                console.log(date);
+                times[i].日時 = date[0];
                 console.log(times[i].日時);
 
                 dt = new Date(times[i].開始時刻);
                 dt = dt.toLocaleString();
-                var result = dt.substring(10, 15);
-                console.log(result);
-                times[i].開始時刻 = result;
+                const startTimeArray = dt.split(" ");
+                console.log(startTimeArray);
+                times[i].開始時刻 = startTimeArray[1];
                 console.log(times[i].開始時刻);
 
                 dt = new Date(times[i].終了時刻);
                 dt = dt.toLocaleString();
-                var result = dt.substring(10, 16);
-                console.log(result);
-                times[i].終了時刻 = result;
+                const endTimeArray = dt.split(" ");
+                console.log(endTimeArray);
+                times[i].終了時刻 = endTimeArray[1];
                 console.log(times[i].終了時刻);
             }
 
