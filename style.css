@@ -1,0 +1,29 @@
+h1{
+  border: solid 1px black;
+  border-radius: 1em;
+  padding: 30px;
+}
+table {
+  text-align: center;
+  width: 80%;
+}
+
+.thColor {
+  /*thに対して*/
+  color: #FF9800;
+  /*文字色*/
+  background: #fff5e5;
+  /*背景色*/
+}
+
+.text {
+  padding: 20px;
+  background: rgb(207, 201, 201);
+}
+
+table td div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}

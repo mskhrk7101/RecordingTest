@@ -6,27 +6,62 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>音声認識</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <!-- <a href="test.html">JSON入力</a> -->
-    <div>
-        <button id="start-btn">START</button>
-        <button id="stop-btn">STOP</button>
-    </div>
+    <h1>日報登録</h1>
+    <table>
+        <tr>
+            <th class="thColor">日時</th>
+            <th class="thColor">時間</th>
+            <th class="thColor">作業内容</th>
+            <th></th>
+        </tr>
+        <tr>
+            <td class="text">
+                <input type="date" name="作業日" id="date" value=today>
+            </td>
+            <td class="text">
+                <!-- <label for="startTime">開始時間：</label> -->
+                <input type="time" id="startTime" name="開始の時刻" value="08:00" />
+                <label>〜</label>
+                <input type="time" id="endTime" name="終了の時刻" value="18:00" />
+            </td>
+            <td class="text">
+                <div class="speaking">
+                    <div>
+                        <button id="start-btn">音声入力開始</button>
+                    </div>
+                    <div>
+                        音声認識中のテキスト
+                        <p id="process"></p>
+                    </div>
+                    <div>
+                        認識結果
+                        <ul id="results">
+                    </div>
+                </div>
+            </td>
+            <td style="padding: 20px;">
+                <div>
+                    <button id="stop-btn" style="background-color: rgb(211, 201, 201);">登録</button>
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    <div>
-        音声認識中のテキスト
-        <p id="process"></p>
-    </div>
-    <div>
-        認識結果
-        <ol id="results">
-    </div>
-    <div id="result"></div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
+        window.onload = function () {
+            var today = new Date();
+            today.setDate(today.getDate());
+            var yyyy = today.getFullYear();
+            var mm = ("0" + (today.getMonth() + 1)).slice(-2);
+            var dd = ("0" + today.getDate()).slice(-2);
+            document.getElementById("date").value = yyyy + '-' + mm + '-' + dd;
+        }
         //GAS WebアプリのURL
         const END_POINT = "https://script.google.com/macros/s/AKfycbxv54tcn6c5cr7cs6-ugnRfQBTF_OOUJxFGY1fDoG_rbqLSlzBO06HegbeKyDMGyyQZHg/exec";
         //読み書きするスプレッドシート（タブ）の番号
@@ -62,8 +97,14 @@
                     result.innerText = transcript;
                     results.appendChild(result);
                     let textArray = JSON.parse(getFromGAS());
-                    const date = getDate();
-                    const text = { "id": "0", "name": transcript, "date": date };
+                    let date = document.getElementById("date").value;
+                    let startTime = document.getElementById("startTime").value;
+                    const endTime = document.getElementById("endTime").value;
+                    console.log(textArray.length);
+                    textArray = timeLayout(textArray);
+                    console.log(textArray);
+                    const dateToday = getDate();
+                    const text = { "社員番号": "0", "日時": date, "開始時刻": startTime, "終了時刻": endTime, " 作業内容": transcript, "報告日時": dateToday };
                     textArray.push(text);
                     // console.log(textArray);
                     postToGAS(textArray);
@@ -123,34 +164,15 @@
         // 同期処理
         // https://qiita.com/katsukii/items/bd64efcf4f070d77c028
         function getFromGAS() {
-            var result = $.ajax({
+            let result = $.ajax({
                 type: "GET",
                 url: END_POINT,
                 data: { sheetNo: SHEET_NO },
                 async: false
             }).responseText;
+            console.log(result);
             return result;
         }
-        // return $.ajax({
-        //     type: "GET",
-        //     url: END_POINT,
-        //     data: { sheetNo: SHEET_NO }
-
-
-        // }).done((result) => {        // 成功した時の処理
-        //     // dataObj = JSON.parse(result);
-        //     console.log("get done:" + result);
-        //     document.getElementById("result").value = result;
-        //     // console.log( document.getElementById("result").value);
-        //     // return "JJJ";
-
-        // }).fail((error) => {  // 失敗した時の処理
-        //     alert('Error:' + JSON.stringify(error));
-
-        // }).always((data) => {// 常にやる処理
-        //     // do something
-        //     return data;
-        // });
 
         //曜日取得
         // https://www.pazru.net/js/date/1.html
@@ -166,16 +188,44 @@
             let hour = date.getHours();
             let min = date.getMinutes();
             let sec = date.getSeconds();
-           
+
             hour < 10 ? hour = "0" + hour : hour;
             min < 10 ? min = "0" + min : min;
             sec < 10 ? sec = "0" + sec : sec;
-            
+
             let yobi = new Array("日", "月", "火", "水", "木", "金", "土");
-            const dateTime = year + "/" + month + "/" + day + "(" + yobi[week] + ")" + "" + hour + ":" + min + " " + sec;
+            const dateTime = year + "/" + month + "/" + day + "(" + yobi[week] + ")" + "" + hour + ":" + min + ":" + sec;
 
             return dateTime;
 
+        }
+        //日付のレイアウト
+        // https://www.delftstack.com/ja/howto/javascript/convert-utc-to-local-time-in-javascript/
+        function timeLayout(times) {
+            for (let i = 0; times.length > i; i++) {
+                let dt = new Date(times[i].日時);
+                dt = dt.toLocaleString();
+                var result = dt.substring(0, 9);
+                console.log(result);
+                times[i].日時 = result;
+                console.log(times[i].日時);
+
+                dt = new Date(times[i].開始時刻);
+                dt = dt.toLocaleString();
+                var result = dt.substring(10, 15);
+                console.log(result);
+                times[i].開始時刻 = result;
+                console.log(times[i].開始時刻);
+
+                dt = new Date(times[i].終了時刻);
+                dt = dt.toLocaleString();
+                var result = dt.substring(10, 16);
+                console.log(result);
+                times[i].終了時刻 = result;
+                console.log(times[i].終了時刻);
+            }
+
+            return times;
         }
     </script>
 </body>
