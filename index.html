@@ -61,11 +61,13 @@
                     let result = document.createElement("li");
                     result.innerText = transcript;
                     results.appendChild(result);
-                    console.log(getFromGAS());
+                    let textArray = JSON.parse(getFromGAS());
                     const date = getDate();
-                    const text = [{ "id": "0", "name": transcript, "date": date }];
-                    postToGAS(text);
-                    console.log(transcript);
+                    const text = { "id": "0", "name": transcript, "date": date };
+                    textArray.push(text);
+                    // console.log(textArray);
+                    postToGAS(textArray);
+                    // console.log(transcript);
                 } else {
                     interimTranscript += transcript;
                 }
@@ -118,28 +120,37 @@
                     }
                 );
         }
-        let aaa = "";
+        // 同期処理
+        // https://qiita.com/katsukii/items/bd64efcf4f070d77c028
         function getFromGAS() {
-            return $.ajax({
+            var result = $.ajax({
                 type: "GET",
                 url: END_POINT,
-                data: { sheetNo: SHEET_NO }
-
-            }).done((result) => {        // 成功した時の処理
-                // dataObj = JSON.parse(result);
-                console.log("get done:" + result);
-                document.getElementById("result").value = result;
-                // console.log( document.getElementById("result").value);
-                // return "JJJ";
-
-            }).fail((error) => {  // 失敗した時の処理
-                alert('Error:' + JSON.stringify(error));
-
-            }).always((data) => {// 常にやる処理
-                // do something
-            });
-
+                data: { sheetNo: SHEET_NO },
+                async: false
+            }).responseText;
+            return result;
         }
+        // return $.ajax({
+        //     type: "GET",
+        //     url: END_POINT,
+        //     data: { sheetNo: SHEET_NO }
+
+
+        // }).done((result) => {        // 成功した時の処理
+        //     // dataObj = JSON.parse(result);
+        //     console.log("get done:" + result);
+        //     document.getElementById("result").value = result;
+        //     // console.log( document.getElementById("result").value);
+        //     // return "JJJ";
+
+        // }).fail((error) => {  // 失敗した時の処理
+        //     alert('Error:' + JSON.stringify(error));
+
+        // }).always((data) => {// 常にやる処理
+        //     // do something
+        //     return data;
+        // });
 
         //曜日取得
         // https://www.pazru.net/js/date/1.html
@@ -154,10 +165,14 @@
             let day = date.getDate();
             let hour = date.getHours();
             let min = date.getMinutes();
-            // let seco = date.getSeconds();
-
+            let sec = date.getSeconds();
+           
+            hour < 10 ? hour = "0" + hour : hour;
+            min < 10 ? min = "0" + min : min;
+            sec < 10 ? sec = "0" + sec : sec;
+            
             let yobi = new Array("日", "月", "火", "水", "木", "金", "土");
-            const dateTime = year + "/" + month + "/" + day + "(" + yobi[week] + ")" + "" + hour + ":" + min;
+            const dateTime = year + "/" + month + "/" + day + "(" + yobi[week] + ")" + "" + hour + ":" + min + " " + sec;
 
             return dateTime;
 
