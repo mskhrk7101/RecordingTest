@@ -31,6 +31,7 @@
         const END_POINT = "https://script.google.com/macros/s/AKfycbxv54tcn6c5cr7cs6-ugnRfQBTF_OOUJxFGY1fDoG_rbqLSlzBO06HegbeKyDMGyyQZHg/exec";
         //読み書きするスプレッドシート（タブ）の番号
         const SHEET_NO = 1;
+        let dataObj = {};
 
         // Document.querySelector()
         // https://developer.mozilla.org/ja/docs/Web/API/Document/querySelector
@@ -57,10 +58,12 @@
                 // console.log(event.results[i]);
                 if (event.results[i].isFinal) {
                     // 音声認識が完了した場合にisFinalがtrueになる
-                    var result = document.createElement("li");
+                    let result = document.createElement("li");
                     result.innerText = transcript;
                     results.appendChild(result);
-                    const text = [{ "id": "0", "name": transcript }];
+                    console.log(getFromGAS());
+                    const date = getDate();
+                    const text = [{ "id": "0", "name": transcript, "date": date }];
                     postToGAS(text);
                     console.log(transcript);
                 } else {
@@ -77,6 +80,7 @@
         stopBtn.onclick = () => {
             recognition.stop();
         };
+
         function postToGAS(Content) {
             console.log(Content);
 
@@ -113,6 +117,47 @@
                         alert('Error:' + JSON.stringify(error));
                     }
                 );
+        }
+
+        function getFromGAS() {
+            $.ajax({
+                type: "GET",
+                url: END_POINT,
+                data: { sheetNo: SHEET_NO }
+
+            }).done((result) => {        // 成功した時の処理
+                dataObj = JSON.parse(result);
+                console.log("get done:" + result);
+                return "JJJ";
+
+            }).fail((error) => {  // 失敗した時の処理
+                alert('Error:' + JSON.stringify(error));
+
+            }).always((data) => {// 常にやる処理
+                // do something
+            });
+        }
+
+        //曜日取得
+        // https://www.pazru.net/js/date/1.html
+        function getDate() {
+            //投稿日データを変数dateに格納
+            let date = new Date();
+
+            //年・月・日・曜日を取得する
+            let year = date.getFullYear();
+            let month = date.getMonth() + 1;
+            let week = date.getDay();
+            let day = date.getDate();
+            let hour = date.getHours();
+            let min = date.getMinutes();
+            // let seco = date.getSeconds();
+
+            let yobi = new Array("日", "月", "火", "水", "木", "金", "土");
+            const dateTime = year + "/" + month + "/" + day + "(" + yobi[week] + ")" + "" + hour + ":" + min;
+
+            return dateTime;
+
         }
     </script>
 </body>
