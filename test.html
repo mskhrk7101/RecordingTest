@@ -11,7 +11,8 @@
 <body>
     <a href="index.html">音声入力</a>
     <p>GET and POST <br>
-        to Google SpreadSheet</p>
+        to Google SpreadSheet
+    </p>
     <textarea id="textArea" rows="5" cols="25"></textarea>
     <br>
     <button id="postButton">POST</button>
@@ -26,7 +27,7 @@
 
         document.getElementById("postButton").addEventListener('click', postToGAS, false);
         document.getElementById("getButton").addEventListener('click', getFromGAS, false);
-        let dataObj = {};
+        // let dataObj = {};
 
         // trim()は空白などをなくしてくれる。
         function postToGAS() {
@@ -72,7 +73,7 @@
                 data: { sheetNo: SHEET_NO }
 
             }).done((result) => {        // 成功した時の処理
-                dataObj = JSON.parse(result);
+                // dataObj = JSON.parse(result);
                 document.getElementById("textArea").value = result;
                 console.log("get done:" + result);
 

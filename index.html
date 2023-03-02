@@ -22,8 +22,8 @@
     <div>
         認識結果
         <ol id="results">
-            </p>
     </div>
+    <div id="result"></div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
@@ -31,7 +31,7 @@
         const END_POINT = "https://script.google.com/macros/s/AKfycbxv54tcn6c5cr7cs6-ugnRfQBTF_OOUJxFGY1fDoG_rbqLSlzBO06HegbeKyDMGyyQZHg/exec";
         //読み書きするスプレッドシート（タブ）の番号
         const SHEET_NO = 1;
-        let dataObj = {};
+        // let dataObj = {};
 
         // Document.querySelector()
         // https://developer.mozilla.org/ja/docs/Web/API/Document/querySelector
@@ -118,17 +118,19 @@
                     }
                 );
         }
-
+        let aaa = "";
         function getFromGAS() {
-            $.ajax({
+            return $.ajax({
                 type: "GET",
                 url: END_POINT,
                 data: { sheetNo: SHEET_NO }
 
             }).done((result) => {        // 成功した時の処理
-                dataObj = JSON.parse(result);
+                // dataObj = JSON.parse(result);
                 console.log("get done:" + result);
-                return "JJJ";
+                document.getElementById("result").value = result;
+                // console.log( document.getElementById("result").value);
+                // return "JJJ";
 
             }).fail((error) => {  // 失敗した時の処理
                 alert('Error:' + JSON.stringify(error));
@@ -136,6 +138,7 @@
             }).always((data) => {// 常にやる処理
                 // do something
             });
+
         }
 
         //曜日取得
