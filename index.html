@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
 
-
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -69,8 +67,7 @@
             let dd = ("0" + today.getDate()).slice(-2);
             document.getElementById("date").value = yyyy + '-' + mm + '-' + dd;
         }
-        getDate();
-        console.log(getDate());
+
         //GAS WebアプリのURL
         const END_POINT = "https://script.google.com/macros/s/AKfycbxv54tcn6c5cr7cs6-ugnRfQBTF_OOUJxFGY1fDoG_rbqLSlzBO06HegbeKyDMGyyQZHg/exec";
         //読み書きするスプレッドシート（タブ）の番号
@@ -81,7 +78,6 @@
         // https://developer.mozilla.org/ja/docs/Web/API/Document/querySelector
         const startBtn = document.querySelector("#start-btn");
         const stopBtn = document.querySelector("#stop-btn");
-        const registerBtn = document.querySelector("#register-btn");
         const process = document.querySelector("#process");
         const results = document.querySelector("#results");
         const reRecordingBtn = document.querySelector("#rerecording-btn");
@@ -142,6 +138,7 @@
 
         // 音声入力終了ボタンが押されたとき
         stopBtn.onclick = () => {
+            event.isFinal = true;
             // reRecordingBtn.classList.remove('hidden');
             recognition.stop();
         };
@@ -240,6 +237,5 @@
             return times;
         }
     </script>
-</body>
 
 </html>
