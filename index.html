@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>音声認識</title>
+    <title>音声日報</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,17 +13,24 @@
     <h1>日報登録</h1>
     <table>
         <tr>
+            <th class="thColor">社員番号</th>
             <th class="thColor">日時</th>
             <th class="thColor">時間</th>
             <th class="thColor">作業内容</th>
-            <th></th>
         </tr>
         <tr>
+            <td class="text">
+                <select name="employeeNumber" id="employeeNumber">
+                    <option value="">社員番号を選択</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </td>
             <td class="text">
                 <input type="date" name="作業日" id="date" value=today>
             </td>
             <td class="text">
-                <!-- <label for="startTime">開始時間：</label> -->
                 <input type="time" id="startTime" name="開始の時刻" value="08:00" />
                 <label>〜</label>
                 <input type="time" id="endTime" name="終了の時刻" value="18:00" />
@@ -38,18 +45,13 @@
                 </div>
                 <div>
                     認識結果
-                    <p id="results"></p>
+                    <ul id="results">
                 </div>
                 <div>
                     <button id="stop-btn">音声入力終了</button>
                 </div>
                 <div>
                     <button id="rerecording-btn" class="hidden">やり直す</button>
-                </div>
-            </td>
-            <td style="padding: 20px;">
-                <div>
-                    <button id="register-btn" class="hidden2" style="background-color: rgb(211, 201, 201);">登録</button>
                 </div>
             </td>
         </tr>
@@ -65,13 +67,15 @@
             let dd = ("0" + today.getDate()).slice(-2);
             document.getElementById("date").value = yyyy + '-' + mm + '-' + dd;
         }
+        getDate();
+        console.log(getDate());
         //GAS WebアプリのURL
         const END_POINT = "https://script.google.com/macros/s/AKfycbxv54tcn6c5cr7cs6-ugnRfQBTF_OOUJxFGY1fDoG_rbqLSlzBO06HegbeKyDMGyyQZHg/exec";
         //読み書きするスプレッドシート（タブ）の番号
         const SHEET_NO = 1;
         // let dataObj = {};
 
-        // Document.querySelector()
+        // Document.querySelector()について
         // https://developer.mozilla.org/ja/docs/Web/API/Document/querySelector
         const startBtn = document.querySelector("#start-btn");
         const stopBtn = document.querySelector("#stop-btn");
@@ -95,9 +99,8 @@
             let interimTranscript = ""; // 認識中のテキスト
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 let transcript = event.results[i][0].transcript;
-                console.log(event.results[i]);
-                console.log(document.getElementsByClassName("register"));
-                if (event.results[i].isFinal ) { //&& document.getElementsByClassName("register").value == ""
+                console.log(event.results[i].isFinal);
+                if (event.results[i].isFinal) {
                     // 音声認識が完了した場合にisFinalがtrueになる
                     let result = document.createElement("li");
                     result.innerText = transcript;
@@ -107,16 +110,17 @@
                     let textArray = JSON.parse(getFromGAS());
 
                     // 入力項目の取得
-                    let date = document.getElementById("date").value;
-                    let startTime = document.getElementById("startTime").value;
+                    const date = document.getElementById("date").value;
+                    const startTime = document.getElementById("startTime").value;
                     const endTime = document.getElementById("endTime").value;
-
+                    const employeeNumber = document.getElementById("employeeNumber").value;
+                    console.log(employeeNumber);
                     // textの修正
                     textArray = timeLayout(textArray);
 
                     // 現在日時の取得
                     const dateToday = getDate();
-                    const text = { "社員番号": "0", "日時": date, "開始時刻": startTime, "終了時刻": endTime, " 作業内容": transcript, "報告日時": dateToday };
+                    const text = { "社員番号": employeeNumber, "日時": date, "開始時刻": startTime, "終了時刻": endTime, " 作業内容": transcript, "報告日時": dateToday };
 
                     // スプシカラ取得した配列の最後に追加
                     textArray.push(text);
@@ -128,21 +132,19 @@
             process.innerHTML = interimTranscript;
         };
 
+        // 音声入力開始ボタンが押されたとき
         startBtn.onclick = () => {
             recognition.start();
-            reRecordingBtn.classList.add('hidden');
+            // reRecordingBtn.classList.add('hidden');
         };
+
+        // 音声入力終了ボタンが押されたとき
         stopBtn.onclick = () => {
-            // $(".rerecording-btn").toggleClass("C");
-            reRecordingBtn.classList.remove('hidden');
+            // reRecordingBtn.classList.remove('hidden');
             recognition.stop();
         };
 
-        registerBtn.onclick = () => {
-            // recognition.stop();
-            registerBtn.classList.add('register');
-        };
-
+        // スプシに入力したものを送信
         function postToGAS(Content) {
             console.log(Content);
 
@@ -180,7 +182,7 @@
                     }
                 );
         }
-        // 同期処理
+        // スプシの値取得（同期処理）
         // https://qiita.com/katsukii/items/bd64efcf4f070d77c028
         function getFromGAS() {
             let result = $.ajax({
@@ -192,7 +194,7 @@
             return result;
         }
 
-        //曜日取得
+        //現在日時取得
         // https://www.pazru.net/js/date/1.html
         function getDate() {
             //投稿日データを変数dateに格納
@@ -203,13 +205,9 @@
             let month = date.getMonth() + 1;
             let week = date.getDay();
             let day = date.getDate();
-            let hour = date.getHours();
-            let min = date.getMinutes();
-            let sec = date.getSeconds();
-
-            hour < 10 ? hour = "0" + hour : hour;
-            min < 10 ? min = "0" + min : min;
-            sec < 10 ? sec = "0" + sec : sec;
+            let hour = ("0" + date.getHours()).slice(-2);
+            let min = ("0" + date.getMinutes()).slice(-2);
+            let sec = ("0" + date.getSeconds()).slice(-2);
 
             let yobi = new Array("日", "月", "火", "水", "木", "金", "土");
             const dateTime = year + "/" + month + "/" + day + "(" + yobi[week] + ")" + "" + hour + ":" + min + ":" + sec;
