@@ -118,7 +118,7 @@
                     const dateToday = getDate();
                     const text = { "社員番号": "0", "日時": date, "開始時刻": startTime, "終了時刻": endTime, " 作業内容": transcript, "報告日時": dateToday };
 
-                    // スプシの最後に追加
+                    // スプシカラ取得した配列の最後に追加
                     textArray.push(text);
                     postToGAS(textArray);
                 } else {
