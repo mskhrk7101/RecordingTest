@@ -47,9 +47,9 @@
                     認識結果
                     <ul id="results">
                 </div>
-                <div>
+                <!-- <div>
                     <button id="stop-btn">音声入力終了</button>
-                </div>
+                </div> -->
                 <div>
                     <button id="rerecording-btn" class="hidden">やり直す</button>
                 </div>
@@ -98,7 +98,16 @@
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 let transcript = event.results[i][0].transcript;
                 console.log(event.results[i].isFinal);
+
+                //終了が認識されると書き込み
+                if (transcript.indexOf("終了") !== -1) {
+                    // event.results[i].isFinal == true;
+                    recognition.stop();
+                }
+
                 if (event.results[i].isFinal) {
+                    const talkArray = transcript.split("終了");
+                    transcript = talkArray[0];
                     // 音声認識が完了した場合にisFinalがtrueになる
                     let result = document.createElement("li");
                     result.innerText = transcript;
@@ -137,11 +146,11 @@
         };
 
         // 音声入力終了ボタンが押されたとき
-        stopBtn.onclick = () => {
-            event.isFinal = true;
-            // reRecordingBtn.classList.remove('hidden');
-            recognition.stop();
-        };
+        // stopBtn.onclick = () => {
+        //     // event.isFinal = true;
+        //     // reRecordingBtn.classList.remove('hidden');
+        //     recognition.stop();
+        // };
 
         // スプシに入力したものを送信
         function postToGAS(Content) {
