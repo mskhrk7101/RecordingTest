@@ -29,28 +29,31 @@
                 <input type="time" id="endTime" name="終了の時刻" value="18:00" />
             </td>
             <td class="text">
-                <div class="speaking">
-                    <div>
-                        <button id="start-btn">音声入力開始</button>
-                    </div>
-                    <div>
-                        音声認識中のテキスト
-                        <p id="process"></p>
-                    </div>
-                    <div>
-                        認識結果
-                        <ul id="results">
-                    </div>
+                <div>
+                    <button id="start-btn">音声入力開始</button>
+                </div>
+                <div>
+                    音声認識中のテキスト
+                    <p id="process"></p>
+                </div>
+                <div>
+                    認識結果
+                    <p id="results"></p>
+                </div>
+                <div>
+                    <button id="stop-btn">音声入力終了</button>
+                </div>
+                <div>
+                    <button id="rerecording-btn" class="hidden">やり直す</button>
                 </div>
             </td>
             <td style="padding: 20px;">
                 <div>
-                    <button id="stop-btn" style="background-color: rgb(211, 201, 201);">登録</button>
+                    <button id="register-btn" class="hidden2" style="background-color: rgb(211, 201, 201);">登録</button>
                 </div>
             </td>
         </tr>
     </table>
-
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
@@ -72,8 +75,10 @@
         // https://developer.mozilla.org/ja/docs/Web/API/Document/querySelector
         const startBtn = document.querySelector("#start-btn");
         const stopBtn = document.querySelector("#stop-btn");
+        const registerBtn = document.querySelector("#register-btn");
         const process = document.querySelector("#process");
         const results = document.querySelector("#results");
+        const reRecordingBtn = document.querySelector("#rerecording-btn");
 
         const recognition = new webkitSpeechRecognition();
 
@@ -90,8 +95,9 @@
             let interimTranscript = ""; // 認識中のテキスト
             for (let i = event.resultIndex; i < event.results.length; i++) {
                 let transcript = event.results[i][0].transcript;
-                // console.log(event.results[i]);
-                if (event.results[i].isFinal) {
+                console.log(event.results[i]);
+                console.log(document.getElementsByClassName("register"));
+                if (event.results[i].isFinal ) { //&& document.getElementsByClassName("register").value == ""
                     // 音声認識が完了した場合にisFinalがtrueになる
                     let result = document.createElement("li");
                     result.innerText = transcript;
@@ -104,11 +110,9 @@
                     let date = document.getElementById("date").value;
                     let startTime = document.getElementById("startTime").value;
                     const endTime = document.getElementById("endTime").value;
-                    console.log(textArray.length);
 
                     // textの修正
                     textArray = timeLayout(textArray);
-                    console.log(textArray);
 
                     // 現在日時の取得
                     const dateToday = getDate();
@@ -126,10 +130,17 @@
 
         startBtn.onclick = () => {
             recognition.start();
+            reRecordingBtn.classList.add('hidden');
+        };
+        stopBtn.onclick = () => {
+            // $(".rerecording-btn").toggleClass("C");
+            reRecordingBtn.classList.remove('hidden');
+            recognition.stop();
         };
 
-        stopBtn.onclick = () => {
-            recognition.stop();
+        registerBtn.onclick = () => {
+            // recognition.stop();
+            registerBtn.classList.add('register');
         };
 
         function postToGAS(Content) {
@@ -178,7 +189,6 @@
                 data: { sheetNo: SHEET_NO },
                 async: false
             }).responseText;
-            console.log(result);
             return result;
         }
 
@@ -213,25 +223,18 @@
             for (let i = 0; times.length > i; i++) {
                 let dt = new Date(times[i].日時);
                 dt = dt.toLocaleString();
-                console.log(dt);
                 let date = dt.split(" ");
-                console.log(date);
                 times[i].日時 = date[0];
-                console.log(times[i].日時);
 
                 dt = new Date(times[i].開始時刻);
                 dt = dt.toLocaleString();
                 const startTimeArray = dt.split(" ");
-                console.log(startTimeArray);
                 times[i].開始時刻 = startTimeArray[1];
-                console.log(times[i].開始時刻);
 
                 dt = new Date(times[i].終了時刻);
                 dt = dt.toLocaleString();
                 const endTimeArray = dt.split(" ");
-                console.log(endTimeArray);
                 times[i].終了時刻 = endTimeArray[1];
-                console.log(times[i].終了時刻);
             }
 
             return times;
