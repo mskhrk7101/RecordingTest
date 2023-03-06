@@ -1,2 +1,12 @@
 String.prototype.trim()について
 https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/String/Trim
+Document.querySelector()について
+https://developer.mozilla.org/ja/docs/Web/API/Document/querySelector
+EventTarget.addEventListener()について
+https://developer.mozilla.org/ja/docs/Web/API/EventTarget/addEventListener
+JSONのparseとstringifyについて
+https://www.task-notes.com/entry/20160719/1468858991
+https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
+日付、現在時刻の取得
+https://www.pazru.net/js/date/1.html
+Ajax戻り値について

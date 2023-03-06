@@ -137,7 +137,10 @@
                         return 0;
                     });
                     console.log(textArray);
-                    postToGAS(textArray);
+                    postToGAS(textArray)
+                    // for (let i = 0; i < textArray.length; i++) {
+                    //     postToGAS(textArray, (i + 1));
+                    // }
                 } else {
                     interimTranscript += transcript;
                 }
@@ -152,7 +155,7 @@
         };
 
         // スプシに入力したものを送信
-        function postToGAS(Content) {
+        function postToGAS(Content, SHEET_NO) {
             console.log(Content);
 
             //データがJSONかどうかのチェック
