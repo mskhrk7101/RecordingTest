@@ -113,34 +113,47 @@
                     // スプシの値を取得
                     let textArray = JSON.parse(getFromGAS());
 
-                    // 入力項目の取得
-                    const date = document.getElementById("date").value;
-                    const startTime = document.getElementById("startTime").value;
-                    const endTime = document.getElementById("endTime").value;
-                    const employeeNumber = document.getElementById("employeeNumber").value;
-                    console.log(employeeNumber);
                     // textの修正
                     textArray = timeLayout(textArray);
 
+                    // 入力項目の取得
+                    let date = document.getElementById("date").value;
+                    let result1 = date.replace('-', '/');
+
+                    //「str」と「result」が同じ文字列になるまで繰り返す
+                    while (result1 !== date) {
+
+                        date = date.replace('-', '/');
+                        result1 = result1.replace('-', '/');
+
+                    }
+
+                    console.log(result1);
+                    // date = date.replace('-', '/');
+                    const startTime = document.getElementById("startTime").value;
+                    const endTime = document.getElementById("endTime").value;
+                    let employeeNumber = document.getElementById("employeeNumber").value;
+                    employeeNumber = Number(employeeNumber);
                     // 現在日時の取得
                     const dateToday = getDate();
-                    const text = { "社員番号": employeeNumber, "日時": date, "開始時刻": startTime, "終了時刻": endTime, " 作業内容": transcript, "報告日時": dateToday };
-
+                    let text = { "社員番号": employeeNumber, "日時": date, "開始時刻": startTime, "終了時刻": endTime, " 作業内容": transcript, "報告日時": dateToday };
+                    // text.日時.replace('-', '/');
                     // スプシカラ取得した配列の最後に追加
                     textArray.push(text);
+                    textArray.sort(function (a, b) {
+                        return (a.日時 > b.日時 ? 1 : -1);
+                    });
 
-                    // 社員番号順に並び替え
+                    // // 社員番号順に並び替え
                     // textArray.sort(function (a, b) {
-                    //     if (a.社員番号 > b.社員番号) return -1;
-                    //     if (b.社員番号 > a.社員番号) return 1;
+                    //     if (a.日時 < b.日時) return -1;
+                    //     if (b.日時 < a.日時) return 1;
 
                     //     return 0;
                     // });
                     console.log(textArray);
                     postToGAS(textArray)
-                    // for (let i = 0; i < textArray.length; i++) {
-                    //     postToGAS(textArray, (i + 1));
-                    // }
+
                 } else {
                     interimTranscript += transcript;
                 }
