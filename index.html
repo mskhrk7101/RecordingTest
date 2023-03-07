@@ -130,12 +130,12 @@
                     textArray.push(text);
 
                     // 社員番号順に並び替え
-                    textArray.sort(function (a, b) {
-                        if (a.社員番号 > b.社員番号) return -1;
-                        if (b.社員番号 > a.社員番号) return 1;
+                    // textArray.sort(function (a, b) {
+                    //     if (a.社員番号 > b.社員番号) return -1;
+                    //     if (b.社員番号 > a.社員番号) return 1;
 
-                        return 0;
-                    });
+                    //     return 0;
+                    // });
                     console.log(textArray);
                     postToGAS(textArray)
                     // for (let i = 0; i < textArray.length; i++) {
@@ -155,7 +155,7 @@
         };
 
         // スプシに入力したものを送信
-        function postToGAS(Content, SHEET_NO) {
+        function postToGAS(Content) {
             console.log(Content);
 
             //データがJSONかどうかのチェック
@@ -175,7 +175,7 @@
                 alert("error:" + e);
                 return;
             }
-
+            console.log(Content);
             //POST送信
             $.ajax({
                 type: "POST",
