@@ -113,11 +113,6 @@
                     // スプシの値を取得
                     let textArray = JSON.parse(getFromGAS());
 
-                    console.log(textArray);
-
-                    // textの修正
-                    // textArray = timeLayout(textArray);
-
                     // 入力項目の取得
                     let date = document.getElementById("date").value;
                     let result1 = date.replace('-', '/');
@@ -130,7 +125,6 @@
 
                     }
 
-                    console.log(result1);
                     const startTime = document.getElementById("startTime").value;
                     const endTime = document.getElementById("endTime").value;
                     let employeeNumber = document.getElementById("employeeNumber").value;
@@ -138,17 +132,12 @@
                     // 現在日時の取得
                     const dateToday = getDate();
                     let text = { "社員番号": employeeNumber, "開始日時": date + startTime, "終了日時": date + endTime, " 作業内容": transcript, "報告日時": dateToday };
-                   
+
                     console.log(textArray);
 
-                    // スプシカラ取得した配列の最後に追加
-                    textArray.push(text);
+                    // スプシカラ取得した配列の最初に追加
+                    textArray.unshift(text);
 
-                    // 開始日時を並び替え
-                    textArray.sort(function (a, b) {
-                        return (a.開始日時 > b.開始日時 ? 1 : -1);
-                    });
-        
                     postToGAS(textArray)
 
                 } else {
@@ -229,13 +218,13 @@
             let min = ("0" + date.getMinutes()).slice(-2);
             let sec = ("0" + date.getSeconds()).slice(-2);
 
-            let yobi = new Array("日", "月", "火", "水", "木", "金", "土");
-            const dateTime = year + "/" + month + "/" + day + "(" + yobi[week] + ")" + "" + hour + ":" + min + ":" + sec;
+            // let yobi = new Array("日", "月", "火", "水", "木", "金", "土");
+            const dateTime = year + "/" + month + "/" + day + "" + hour + ":" + min + ":" + sec;
 
             return dateTime;
 
         }
-        
+
     </script>
 
 </html>
