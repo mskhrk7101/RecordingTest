@@ -131,7 +131,6 @@
                     }
 
                     console.log(result1);
-                    // date = date.replace('-', '/');
                     const startTime = document.getElementById("startTime").value;
                     const endTime = document.getElementById("endTime").value;
                     let employeeNumber = document.getElementById("employeeNumber").value;
@@ -139,22 +138,16 @@
                     // 現在日時の取得
                     const dateToday = getDate();
                     let text = { "社員番号": employeeNumber, "開始日時": date + startTime, "終了日時": date + endTime, " 作業内容": transcript, "報告日時": dateToday };
-                    // text.日時.replace('-', '/');
+                   
                     console.log(textArray);
 
                     // スプシカラ取得した配列の最後に追加
                     textArray.push(text);
+
+                    // 開始日時を並び替え
                     textArray.sort(function (a, b) {
                         return (a.開始日時 > b.開始日時 ? 1 : -1);
                     });
-
-                    // // 社員番号順に並び替え
-                    // textArray.sort(function (a, b) {
-                    //     if (a.日時 < b.日時) return -1;
-                    //     if (b.日時 < a.日時) return 1;
-
-                    //     return 0;
-                    // });
         
                     postToGAS(textArray)
 
@@ -242,29 +235,7 @@
             return dateTime;
 
         }
-        //日付のレイアウト
-        // https://www.delftstack.com/ja/howto/javascript/convert-utc-to-local-time-in-javascript/
-        // function timeLayout(times) {
-        //     for (let i = 0; times.length > i; i++) {
-        //         // let dt = new Date(times[i].日時);
-        //         // dt = dt.toLocaleString();
-        //         // let date = dt.split(" ");
-        //         // times[i].日時 = date[0];
-        //         console.log(times);
-
-        //         dt = new Date(times[i].開始日時);
-        //         dt = dt.toLocaleString();
-        //         const startTimeArray = dt.split(" ");
-        //         times[i].開始日時 = startTimeArray[1];
-
-        //         dt = new Date(times[i].終了日時);
-        //         dt = dt.toLocaleString();
-        //         const endTimeArray = dt.split(" ");
-        //         times[i].終了日時 = endTimeArray[1];
-        //     }
-
-        //     return times;
-        // }
+        
     </script>
 
 </html>
